@@ -62,13 +62,14 @@ const usersPost = async(req = request, res) => {
 const usersDelete = async(req, res) => {
 
     const { userId } = req.params;
-
-    await User.findByIdAndUpdate(userId, { state: false })
-        //await User.deleteOne({ userId });
+    const userAuthenticate = req.userAuthenticate;
+    const user = await User.findByIdAndUpdate(userId, { state: false })
 
     res.json({
         success: true,
-        message: `delete user with Id ${userId}`
+        message: `delete user with Id ${userId}`,
+        user,
+        //userAuthenticate
     })
 }
 
