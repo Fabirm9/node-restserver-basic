@@ -2,6 +2,7 @@ const { response } = require("express");
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
 const { generateJWT } = require("../helpers/generate-jwt");
+const { googleVerify } = require("../helpers/google-verify");
 
 const login = async(req, res = response) => {
 
@@ -49,6 +50,51 @@ const login = async(req, res = response) => {
 
 }
 
+const googleSingIn = async(req, res = response) => {
+    const { id_token } = req.body;
+
+    try {
+        const { name, img, email } = await googleVerify(id_token);
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            const data = {
+                name,
+                email,
+                img,
+                password: '23423',
+                google: true,
+                role: 'USER_ROLE'
+            };
+            user = new User(data);
+            await user.save();
+        }
+
+
+        if (!user.state) {
+            return res.status(401).json({
+                msg: "Talk with admin, user block "
+            })
+        }
+
+        const token = await generateJWT(user.id);
+
+        res.json({
+            msg: 'Ok',
+            user,
+            token
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            msg: "false",
+            msg: "Token can't verify "
+        })
+    }
+}
+
 module.exports = {
-    login
+    login,
+    googleSingIn
 }
