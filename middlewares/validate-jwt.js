@@ -8,7 +8,8 @@ const validateJWT = async(req = request, res = response, next) => {
     const token = req.header('x-token');
     if (!token) {
         return res.status(401).json({
-            msg: 'without token'
+            msg: 'without token',
+            ok: false
         })
     }
 
@@ -19,7 +20,8 @@ const validateJWT = async(req = request, res = response, next) => {
 
         if (!user) {
             return res.status(401).json({
-                msg: 'Token invalid - user no found'
+                msg: 'Token invalid - user no found',
+                ok: false
             })
         }
 
@@ -27,7 +29,8 @@ const validateJWT = async(req = request, res = response, next) => {
         //verify if uid has uid true        
         if (!user.state) {
             return res.status(401).json({
-                msg: 'Token invalid - state:false'
+                msg: 'Token invalid - state:false',
+                ok: false
             })
         }
         req.userAuthenticate = user;
@@ -36,7 +39,8 @@ const validateJWT = async(req = request, res = response, next) => {
     } catch (error) {
         console.log(error);
         res.status(401).json({
-            msh: 'Token invalid'
+            msg: 'Token invalid',
+            ok: false
         })
     }
 

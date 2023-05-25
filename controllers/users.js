@@ -2,6 +2,7 @@ const { response, request } = require('express');
 const bcryptjs = require('bcryptjs')
 
 const User = require('../models/user');
+const { generateJWT } = require('../helpers/generate-jwt');
 
 
 const usersGet = async(req = request, res = response) => {
@@ -49,13 +50,18 @@ const usersPost = async(req = request, res) => {
     const salt = bcryptjs.genSaltSync();
     user.password = bcryptjs.hashSync(password, salt);
 
+    //Generate jwt
+    const token = await generateJWT(user.id);
+
+
     //save
     await user.save();
 
     res.status(201).json({
-        success: true,
-        message: "post Api",
-        user
+        ok: true,
+        msg: "post Api",
+        user,
+        token
     })
 };
 
@@ -66,8 +72,8 @@ const usersDelete = async(req, res) => {
     const user = await User.findByIdAndUpdate(userId, { state: false })
 
     res.json({
-        success: true,
-        message: `delete user with Id ${userId}`,
+        ok: true,
+        msg: `delete user with Id ${userId}`,
         user,
         //userAuthenticate
     })

@@ -29,7 +29,8 @@ const login = async(req, res = response) => {
 
         if (!validatePassword) {
             return res.status(400).json({
-                msg: "user / password aren't right - password"
+                msg: "user / password aren't right - password",
+                ok: false
             })
         }
 
@@ -38,13 +39,15 @@ const login = async(req, res = response) => {
 
         res.json({
             user,
-            token
+            token,
+            ok: true
         })
 
     } catch (error) {
         console.log(error)
         res.status(500).json({
-            msg: 'Upss.. something went wrong'
+            msg: 'Upss.. something went wrong',
+            ok: false
         })
     }
 
@@ -94,7 +97,23 @@ const googleSingIn = async(req, res = response) => {
     }
 }
 
+const verifyToken = async(req, res = response) => {
+
+    const { userAuthenticate } = req;
+
+    //Generate jwt
+    const token = await generateJWT(userAuthenticate.id);
+
+    res.json({
+        userAuthenticate,
+        token,
+        ok: true
+    })
+
+}
+
 module.exports = {
     login,
-    googleSingIn
+    googleSingIn,
+    verifyToken
 }
